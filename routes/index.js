@@ -17,7 +17,7 @@ const {
 
 router.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://blood-bank-frontend-oafj.onrender.com',
     credentials: true,
   })
 );
