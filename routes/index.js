@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
-const authMiddleware = require('../middlewares/auth.middlewares').default;
+const authMiddleware = require('../middlewares/auth.middlewares');
 const {
   userRegister,
   getAllUsers,
@@ -14,9 +14,13 @@ const {
   deletePatient,
 } = require('../controllers/patient.controller');
 
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
+const LOCAL_URL = process.env.LOCAL_URL;
+
 router.use(
   cors({
-    origin: 'https://blood-bank-frontend-oafj.onrender.com',
+    origin: process.env.FRONTEND_URL || process.env.LOCAL_URL,
     credentials: true,
   })
 );
