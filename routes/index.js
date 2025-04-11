@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const cors = require('cors');
 const authMiddleware = require('../middlewares/auth.middlewares').default;
-
 const {
   userRegister,
   getAllUsers,
@@ -22,9 +21,9 @@ router.use(
   })
 );
 
-// Root Route
+// Redirect root to frontend
 router.get('/', (req, res) => {
-  res.send('Welcome to the API!');
+  res.redirect('https://blood-bank-frontend-oafj.onrender.com');
 });
 
 // ******** USER ROUTES **********
