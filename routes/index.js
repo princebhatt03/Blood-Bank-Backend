@@ -7,17 +7,14 @@ const {
   getAllUsers,
   deleteUser,
 } = require('../controllers/user.controller');
-const adminController = require('../controllers/admin.controller');
 const {
   registerPatient,
   getAllPatients,
   deletePatient,
 } = require('../controllers/patient.controller');
+const adminController = require('../controllers/admin.controller');
 
-const FRONTEND_URL = process.env.FRONTEND_URL;
-
-const LOCAL_URL = process.env.LOCAL_URL;
-
+// Enable CORS
 router.use(
   cors({
     origin: process.env.FRONTEND_URL || process.env.LOCAL_URL,
@@ -27,7 +24,8 @@ router.use(
 
 // Redirect root to frontend
 router.get('/', (req, res) => {
-  res.redirect('https://blood-bank-frontend-oafj.onrender.com');
+  const frontendUrl = process.env.FRONTEND_URL || process.env.LOCAL_URL;
+  res.redirect(frontendUrl);
 });
 
 // ******** USER ROUTES **********

@@ -1,14 +1,8 @@
-export default (req, res, next) => {
-  if (req.session && req.session.admin) {
-    return next();
+const authMiddleware = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
-
-  if (req.flash) {
-    req.flash(
-      'error',
-      'You must be logged in as an admin to access this page.'
-    );
-  }
-
-  res.redirect('/adminLogin');
+  next(); 
 };
+
+module.exports = authMiddleware; 

@@ -10,6 +10,7 @@ const adminController = {
       if (!fullName || !username || !email || !mobile || !password) {
         return res.status(400).json({ error: 'All fields are required.' });
       }
+
       const existingAdmin = await Admin.findOne({
         $or: [{ username }, { email }],
       });
@@ -17,6 +18,7 @@ const adminController = {
       if (existingAdmin) {
         return res.status(400).json({ error: 'Admin already exists.' });
       }
+
       const hashedPassword = await bcrypt.hash(password, 10);
       const newAdmin = new Admin({
         fullName,
@@ -50,23 +52,29 @@ const adminController = {
           .status(400)
           .json({ error: 'Username and password are required.' });
       }
+
       const admin = await Admin.findOne({ username });
 
       if (!admin) {
         return res.status(401).json({ error: 'Invalid credentials.' });
       }
+
       const isMatch = await bcrypt.compare(password, admin.password);
       if (!isMatch) {
         return res.status(401).json({ error: 'Invalid credentials.' });
       }
 
+      req.session.admin = {
+        id: admin._id,
+        username: admin.username,
+        fullName: admin.fullName,
+      };
+
+      await req.session.save(); // Ensures session persists
+
       return res.status(200).json({
         message: 'Login successful!',
-        admin: {
-          id: admin._id,
-          username: admin.username,
-          fullName: admin.fullName,
-        },
+        admin: req.session.admin,
       });
     } catch (error) {
       console.error('Admin Login Error:', error);
@@ -77,26 +85,39 @@ const adminController = {
   // Get Admin Details
   async getAdminDetails(req, res) {
     try {
-      const admin = await Admin.findOne();
+      console.log('Session Data:', req.session); // Debugging
+
+      if (!req.session.admin) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const admin = await Admin.findById(req.session.admin.id).select(
+        'fullName username'
+      );
 
       if (!admin) {
         return res.status(404).json({ error: 'Admin not found' });
       }
 
-      res.json({ name: admin.fullName });
+      return res.json({ adminName: admin.fullName });
     } catch (error) {
       console.error('Error fetching admin details:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ error: 'Internal server error' });
     }
   },
 
+  // Admin Logout
   async adminLogout(req, res) {
     try {
-      res.clearCookie('adminToken');
-      return res.status(200).json({ message: 'Logout successful' });
+      req.session.destroy(err => {
+        if (err) {
+          return res.status(500).json({ error: 'Logout failed' });
+        }
+        return res.status(200).json({ message: 'Logout successful' });
+      });
     } catch (error) {
       console.error('Logout Error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ error: 'Internal server error' });
     }
   },
 };
