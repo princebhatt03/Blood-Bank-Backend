@@ -1,0 +1,46 @@
+const express = require('express');
+const router = express.Router();
+const cors = require('cors');
+const authMiddleware = require('../middlewares/auth.middlewares');
+
+const {
+  userRegister,
+  getAllUsers,
+  deleteUser,
+} = require('../controllers/user.controller');
+const adminController = require('../controllers/admin.controller');
+const {
+  registerPatient,
+  getAllPatients,
+  deletePatient,
+} = require('../controllers/patient.controller');
+
+router.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+);
+
+// Root Route
+router.get('/', (req, res) => {
+  res.send('Welcome to the API!');
+});
+
+// ******** USER ROUTES **********
+router.post('/userRegister', userRegister);
+router.get('/getAllUsers', getAllUsers);
+router.delete('/deleteUser/:id', deleteUser);
+
+// ******** ADMIN ROUTES **********
+router.post('/adminRegister', adminController.adminRegister);
+router.post('/adminLogin', adminController.adminLogin);
+router.get('/getAdminDetails', authMiddleware, adminController.getAdminDetails);
+router.post('/logout', adminController.adminLogout);
+
+// ********** PATIENT ROUTES **********
+router.post('/registerPatient', registerPatient);
+router.get('/getAllPatients', getAllPatients);
+router.delete('/deletePatient/:id', deletePatient);
+
+module.exports = router;
