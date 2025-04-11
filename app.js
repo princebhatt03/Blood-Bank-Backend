@@ -31,13 +31,13 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI, // Ensure it's correctly set in .env
+      mongoUrl: process.env.DB_CONNECT,
       collectionName: 'sessions',
       ttl: 24 * 60 * 60, // 1 day
     }),
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // True only in production
-      httpOnly: false, // Set to true for security in production
+      secure: process.env.NODE_ENV === 'production', 
+      httpOnly: false,
       sameSite: 'lax',
     },
   })
